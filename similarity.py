@@ -6,9 +6,12 @@ Isaacson - Similarity of Interval-Class Content Between Pitch-Class Sets: The Ic
 
 
 from .basic_tools import interval_vector
+from ._all_classes import allClasses
 from numpy import sqrt, reshape, array
 from typing import Sequence, List
-
+from sklearn.metrics.pairwise import cosine_similarity
+from sklearn.feature_extraction.text import TfidfVectorizer
+import pandas as pd
 
 def forte(
     pcset1: Sequence,
@@ -152,6 +155,48 @@ def isaacson(
         factor1 += (idv[i] - idv_mean) ** 2
     
     return sqrt(factor1/6)
+    
+
+def text_set_class(
+    set_class: Sequence,
+) -> str:
+
+    """Converts a set class into a string representing its interval vector.
+    """
+    
+    id_dict = {0: "one",
+             1: "two",
+             2: "three",
+             3: "four",
+             4: "five",
+             5: "six"}
+    result = ""
+
+    for i, el in enumerate(interval_vector(set_class)):
+        for _ in range(el):
+            result += id_dict[i] + " "
+
+    return result
+
+
+def text_sim(
+    sc1: Sequence,
+    sc2: Sequence,
+) -> float:
+
+    """Returns the Text_Sim similarity measure between two pitch class sets.
+    """
+
+    corpus = [text_set_class(x) for x in sorted(allClasses)]
+    vectorizer = TfidfVectorizer()
+    trsfm = vectorizer.fit_transform(corpus)
+    text_similarity = cosine_similarity(trsfm)
+    names = [str(x) for x in sorted(allClasses)]
+    df = pd.DataFrame(text_similarity.round(3), columns=names, index=names)
+    return df[str(sc1)][str(sc2)]
+
+
+
 
 
 def simile_table(
