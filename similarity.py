@@ -5,7 +5,7 @@ Isaacson - Similarity of Interval-Class Content Between Pitch-Class Sets: The Ic
 """
 
 
-from .basic_tools import interval_vector
+from .basic_tools import interval_vector, prime_form
 from ._all_classes import allClasses
 from numpy import sqrt, reshape, array
 from typing import Sequence, List
@@ -186,7 +186,9 @@ def text_sim(
 
     """Returns the Text_Sim similarity measure between two pitch class sets.
     """
-
+    sc1 = prime_form(sc1)
+    sc2 = prime_form(sc2)
+    
     corpus = [text_set_class(x) for x in sorted(allClasses)]
     vectorizer = TfidfVectorizer()
     trsfm = vectorizer.fit_transform(corpus)
