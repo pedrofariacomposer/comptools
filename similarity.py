@@ -176,7 +176,7 @@ def text_set_class(
         for _ in range(el):
             result += id_dict[i] + " "
 
-    return result
+    return result.rstrip()
 
 
 def text_sim(

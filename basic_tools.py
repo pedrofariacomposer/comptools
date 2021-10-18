@@ -233,9 +233,10 @@ def prime_form(
     """Returns the Prime Form of a sequence of pitch classes.
     Function written by Raphael Santos.
     """
-    new_pcs = [(x-pitch_classes[0]) % 12 for x in pitch_classes]
-    norm = normal_form(new_pcs)
-    inv = normal_form(inversion_pitch_classes(new_pcs))
+    normal = normal_form(pitch_classes)
+    normal_inv = normal_form(inversion_pitch_classes(pitch_classes))
+    norm = transposition_pitch_classes(normal, -normal[0])
+    inv = transposition_pitch_classes(normal_inv, -normal_inv[0])
     prime = norm
     if inv < norm:
         prime = inv
