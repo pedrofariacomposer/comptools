@@ -8,6 +8,7 @@ from copy import copy
 from itertools import chain, combinations
 from collections import Iterable, defaultdict
 from numpy import array, reshape
+from random import choice
 
 
 
@@ -342,18 +343,58 @@ def stravinsky_rotation(
     return m
 
 
+def remove_reps(
+    seq: Sequence,
+) -> Sequence:
+
+    """Remove consecutive equal elements from a given sequence"""
+    
+    result = [seq[0]]
+    for el in seq[1:]:
+        if el == result[-1]:
+            pass
+        else:
+            result.append(el)
+    return result
+
+    
 def markov(
     seq: Sequence,
+    no_reps: bool = False,
 ) -> Dict:
 
     """Given a sequence of elements, returns a Markov Chain.
     """
-
+    if no_reps:
+        seq = remove_reps(seq)
     result = defaultdict(list)
     for cur, nex in zip(seq[0:-1],seq[1:]): result[cur].append(nex)
     result_dict = dict(result)
     
     return result_dict
+
+
+def build_from_markov(
+    chain: Dict,
+    first,
+    n: int,
+) -> List:
+
+    """Given a Markov Chain, returns a new sequence of length 'n' starting with 'first'.
+    """
+
+    result = [first]
+    i = 0
+    while i < n-1:
+        candidates = chain.get(first)
+        if candidates != None:
+            result.append(choice(candidates))
+            first = result[-1]
+            i += 1
+        else:
+            i = n
+    return result
+
 
 
 def make_golden(
