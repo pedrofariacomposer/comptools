@@ -1,11 +1,11 @@
-from setuptools import setup, find_packages
+import setuptools
 
-setup(name='comptools',
+setuptools.setup(name='comptools',
 version='1.0.0',
 description='Python library for assisting in composing and analyzing music',
 url="https://pedrofariacomposer.github.io/site/",
 author='Pedro Faria',
 author_email='pedrofaria1989@gmail.com',
 license='MIT',
-packages=find_packages(),
+packages=["basic_tools"],
 zip_safe=False)
