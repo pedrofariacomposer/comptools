@@ -7,5 +7,5 @@ url="https://pedrofariacomposer.github.io/site/",
 author='Pedro Faria',
 author_email='pedrofaria1989@gmail.com',
 license='MIT',
-packages=find_packages(),
+packages=["comptools"],
 zip_safe=False)
