@@ -1,6 +1,5 @@
 from setuptools import setup, find_packages
 
-from setuptools import setup
 setup(name='comptools',
 version='1.0.0',
 description='Python library for assisting in composing and analyzing music',
