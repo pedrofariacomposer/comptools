@@ -9,4 +9,4 @@ author_email='pedrofaria1989@gmail.com',
 license='MIT',
 packages=setuptools.find_packages(),
 zip_safe=False,
-requires=["pycse", "music21", "numpy", "matplotlib", "graphviz", "sklearn", "pandas"])
+install_requires=["pycse", "music21", "numpy", "matplotlib", "graphviz", "sklearn", "pandas"])
