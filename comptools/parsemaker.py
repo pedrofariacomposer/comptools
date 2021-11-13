@@ -5,6 +5,7 @@ Partitional Analysis of an existing piece.
 
 
 import music21 as m21
+from collections import defaultdict
 import random
 from typing import Dict, Sequence, List
 
@@ -20,19 +21,26 @@ def make_catalog_dict(
     """
 
     piece = m21.converter.parse(filename)
-    final_dict = dict()
-    unique_durations = []
-    for part in piece.parts:
-        measures = part.getElementsByClass("Measure")
-        for measure in measures:
-            dur_measure = measure.quarterLength
-            if dur_measure not in unique_durations:
-                unique_durations.append(dur_measure)
-                final_dict[dur_measure] = []
-            measure_durs = [x.quarterLength for x in measure.stripTies() if x.quarterLength != 0]
-            final_dict[dur_measure].append(measure_durs)
+    num_parts = len(piece.parts)
+    measures = [part.getElementsByClass("Measure") for part in piece.parts]
+    num_measures = len(measures[0])
 
-    return final_dict                
+    master_list = []
+    final_dict = defaultdict(list)
+
+    for j in range(num_measures):
+        mm_list = []
+        for i in range(num_parts):
+            cur_measure = measures[i][j]
+            durs = [x.quarterLength for x in cur_measure.getElementsByClass("GeneralNote")]
+            mm_list.append(durs)
+        master_list.append(mm_list)
+
+    for mm in master_list:
+        dur_mm = sum(mm[0])
+        final_dict[dur_mm].append(mm)
+
+    return final_dict               
               
 
 def part_frags(
