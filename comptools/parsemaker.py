@@ -54,7 +54,7 @@ def part_frags(
     """
 
     num_parts = len(part)
-    possible_melodies = catalog[dur]
+    possible_melodies = random.choice(catalog[dur])
     choices = random.sample(possible_melodies, num_parts)
     result = []
     for i in range(num_parts):
