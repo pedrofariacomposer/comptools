@@ -294,6 +294,37 @@ def flatten_sequence(
         return [sequence]
 
 
+def group_tuplets(
+    linha: Sequence,
+    min_constant: int = 4,
+) -> List:
+
+    """Given a sequence of quarterLengths, group the tuplets into sublists.
+    If min_constant == 8, the least value considered is a 32nd note.
+    """
+    
+    result = []
+    it = linha.__iter__()
+    while len(flatten_sequence(result)) < len(linha):
+        el = next(it)
+        control = el * min_constant
+        if control == round(control):
+            result.append(el)
+        else:
+            group = [el]
+            valor = sum(group) * min_constant
+            if valor == round(valor):
+                result.append(group)
+                group = []
+            else:
+                valor = sum(group) * min_constant
+                while valor != round(valor):
+                    group.append(next(it))
+                    valor = sum(group) * min_constant
+                result.append(group)
+    return result
+
+
 def simple_multiplication(
     multiplicand: Sequence,
     multiplier: Sequence,
