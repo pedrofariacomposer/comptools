@@ -146,7 +146,7 @@ def inversion_pitch_classes(
     """Finds the inversion of a sequence of pitch classes.
     """
 
-    return [12-pitch_class for pitch_class in pitch_class_sequence]
+    return [(12-pitch_class) % 12 for pitch_class in pitch_class_sequence]
 
 
 def integer_multiplication_pitch_classes(
