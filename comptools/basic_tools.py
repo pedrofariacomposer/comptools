@@ -141,7 +141,7 @@ def inversion_pitches(
 
 def inversion_pitch_classes(
     pitch_class_sequence: Sequence,
-    t_factor = 1: int
+    t_factor: int = 1
 ) -> List:
 
     """Finds the inversion of a sequence of pitch classes.
