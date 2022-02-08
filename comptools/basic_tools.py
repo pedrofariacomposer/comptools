@@ -141,13 +141,15 @@ def inversion_pitches(
 
 def inversion_pitch_classes(
     pitch_class_sequence: Sequence,
+    t_factor = 1: int
 ) -> List:
 
     """Finds the inversion of a sequence of pitch classes.
     """
-
-    return [(12-pitch_class) % 12 for pitch_class in pitch_class_sequence]
-
+    if t_factor == 1:
+        return [(12-pitch_class) % 12 for pitch_class in pitch_class_sequence]
+    else:
+        return transposition_pitch_classes(inversion_pitch_classes(pitch_class_sequence), t_factor)
 
 def integer_multiplication_pitch_classes(
     pitch_class_sequence: Sequence,
@@ -194,7 +196,7 @@ def most_compact(
     b: Sequence,
 ) -> Sequence:
 
-    """ Compares two listas and returns the one that is more compact, as defined by Forte and Straus.
+    """ Compares two lists and returns the one that is more compact, as defined by Forte and Straus.
     Function written by Raphael Santos.
     """
 
