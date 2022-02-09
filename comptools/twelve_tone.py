@@ -2,6 +2,7 @@
 Module with the twelve-tone tools of the Comp_Tools library.
 """
 
+from difflib import SequenceMatcher
 from pandas.core.indexes.interval import interval_range
 from .basic_tools import *
 from pandas import DataFrame
@@ -25,6 +26,98 @@ def twelve_tone_matrix(
     df = DataFrame(m)
 
     return df
+
+
+def order_rep(
+    pcset: Sequence
+) -> List:
+
+    """ Given a tone row, returns a list of pairs [i,ai],
+    on which i is the order number and ai is the pitch class
+    at that order number. Inspired by Milton Babbitt.
+    """
+
+    return [tuple([i,el]) for i, el in enumerate(pcset)]
+
+
+def transposition_order_rep(
+    ttset: Sequence,
+    n: int
+) -> List:
+
+    """ Applies the transposition operation on a tone row with its order numbers
+    """
+    result = [0] * len(ttset)
+    for i, pair in enumerate(ttset):
+        new_pc = (pair[1] + n) % 12
+        for scpair in ttset:
+            if scpair[1] == new_pc:
+                result[i] = scpair
+    return result   
+
+
+def inversion_order_rep(
+    ttset: Sequence,
+    n: int
+) -> List:
+
+    """ Applies the inversion (plus transposition) operation on a tone row with its order numbers
+    """
+    result = [0] * len(ttset)
+    for i, pair in enumerate(ttset):
+        new_pc = ((12 - pair[1]) + n) % 12
+        for scpair in ttset:
+            if scpair[1] == new_pc:
+                result[i] = scpair
+    return result  
+
+
+def order_inversions(
+    ttset: Sequence
+) -> int:
+
+    """ Given a transformed version of a series with order numbers,
+    returns the number of order inversions that ocurred because of the transformation.
+    """
+
+    orders = [x[0] for x in ttset]
+    inv_count = 0
+    for i in range(len(ttset)):
+        for j in range(i+1, len(ttset)):
+            if (orders[i] > orders[j]):
+                inv_count += 1
+            else:
+                pass
+    return inv_count
+
+
+def permutation_cycles(
+    ttset: Sequence
+) -> List:
+
+    """ Given a transformed version of the series with order numbers,
+    returns the sequence of permutations cycles"""
+
+    result = []
+    for i, el in enumerate(ttset):
+        if el[0] == i:
+            result.append(tuple([i]))
+        else:
+            pair = tuple(sorted([i,el[0]]))
+            if pair not in result:
+                result.append(pair)
+    return result
+
+
+def dyad_interval_pairs(
+    ttset: Sequence,
+) -> List:
+
+    """ Given a tone row (in usual form, NOT with order numbers),
+    returns the intervals between consecutive dyads
+    """
+
+    return [(ttset[i]-ttset[i-1]) % 12 for i in range(1,12,2)]
 
 
 def row_partition(
