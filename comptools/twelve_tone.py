@@ -120,6 +120,29 @@ def dyad_interval_pairs(
     return [(ttset[i]-ttset[i-1]) % 12 for i in range(1,12,2)]
 
 
+def compare_dyads(
+    row1: Sequence,
+    row2: Sequence
+) -> Sequence:
+    """ Given two tone rows, compare to see if
+    they have the same dyads as permutations of one another.
+    """
+
+    dyads1 = [tuple(sorted([row1[i],row1[i+1]])) for i in range(0,12,2)]
+    dyads2 = [tuple(sorted([row2[i],row2[i+1]])) for i in range(0,12,2)]
+    if sorted(dyads1) != sorted(dyads2):
+        print("FAIL")
+        return False
+    else:
+        result = []
+        for i,x in enumerate(dyads1):
+            for j,y in enumerate(dyads2):
+                if x == y:
+                    if sorted(tuple([i+1,j+1])) not in result and i != j:
+                        result.append(sorted(tuple([i+1,j+1])))
+    return result
+
+
 def row_partition(
     row: Sequence,
     part: Sequence,

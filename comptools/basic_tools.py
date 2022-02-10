@@ -141,12 +141,12 @@ def inversion_pitches(
 
 def inversion_pitch_classes(
     pitch_class_sequence: Sequence,
-    t_factor: int = 1
+    t_factor: int = 0
 ) -> List:
 
     """Finds the inversion of a sequence of pitch classes.
     """
-    if t_factor == 1:
+    if t_factor == 0:
         return [(12-pitch_class) % 12 for pitch_class in pitch_class_sequence]
     else:
         return transposition_pitch_classes(inversion_pitch_classes(pitch_class_sequence), t_factor)
