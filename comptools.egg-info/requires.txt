@@ -1,0 +1,7 @@
+pycse
+music21
+numpy
+matplotlib
+graphviz
+sklearn
+pandas

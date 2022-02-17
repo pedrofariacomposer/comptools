@@ -126,8 +126,8 @@ def inversion(
     if max(pitches) <= 11:
         return transposition([(12-pitch_class) % 12 for pitch_class in pitches],factor)
     else:
-        intervals = [-x for x in intervals(pitches)]
-        return start_sequence_pitches(pitches[0],intervals)
+        intervals_pitches = [-x for x in intervals(pitches)]
+        return start_sequence_pitches(pitches[0],intervals_pitches)
 
 
 def multiplication(
