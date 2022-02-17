@@ -216,7 +216,7 @@ def prime_form(
     Function written by Raphael Santos.
     """
     normal = normal_form(pitch_classes)
-    normal_inv = normal_form(inversion_pitch_classes(pitch_classes))
+    normal_inv = normal_form(inversion(pitch_classes))
     norm = transposition(normal, -normal[0])
     inv = transposition(normal_inv, -normal_inv[0])
     prime = norm
