@@ -11,16 +11,6 @@ from numpy import array, reshape
 from random import choice
 
 
-
-def pitches_to_pitch_classes(
-    pitches: Sequence,
-) -> List:
-
-    """Transforms a list of MIDI pitches into a list of pitch classes.
-    """
-
-    return [pitch % 12 for pitch in pitches]
-
 def interval_class(
     pitch1: int,
     pitch2: int,
@@ -78,35 +68,35 @@ def retrograde(
     return sequence_copy[-1:]
 
 
-def transposition_pitches(
+def transposition(
     pitches: Sequence,
     transposing_factor: int,
 ) -> List:
-    """Finds the transposition of a sequence of MIDI pitches by a transposing factor.
+
+    """Transposes a sequence of MIDI pitches or pitch classes.
     """
-
-    return [pitch + transposing_factor for pitch in pitches]
-
-
-def transposition_pitch_classes(
-    pitch_classes: Sequence,
-    transposing_factor: int,
-) -> List:
-
-    """Finds the transposition of a sequence of pitch-classes by a transposing factor.
-    """
-
-    return [(pitch + transposing_factor) % 12 for pitch in pitch_classes]
+    result = []
+    if max(pitches) <= 11:
+        return [(pitch + transposing_factor) % 12 for pitch in pitches]
+    else:
+        return [pitch + transposing_factor for pitch in pitches]
 
 
-def interval_sequence_pitches(
+def intervals(
     pitches: Sequence,
+    icclass: bool = False,
 ) -> List:
 
     """Finds the interval sequence of a sequence of MIDI pitches.
     """
 
-    return [pitches[i+1]-pitches[i] for i in range(len(pitches)-1)]
+    if max(pitches) <= 11:
+        if icclass == True:
+            return[interval_class(pitches[i+1],pitches[i]) for i in range(len(pitches)-1)]
+        else:
+            return [(pitches[i+1]-pitches[i]) % 12 for i in range(len(pitches)-1)]
+    else:
+        return [pitches[i+1]-pitches[i] for i in range(len(pitches)-1)]
 
 
 def start_sequence_pitches(
@@ -125,33 +115,22 @@ def start_sequence_pitches(
     return new_sequence
 
 
-def inversion_pitches(
-    pitch_sequence: Sequence,
+def inversion(
+    pitches: Sequence,
+    factor: int = 0
 ) -> List:
 
-    """Finds the inversion of a sequence of MIDI pitches.
+    """Inverts a sequence of pitch classes or a sequence of MIDI pitches.
     """
 
-    first_pitch = pitch_sequence[0]
-    interval_sequence = interval_sequence_pitches(pitch_sequence)
-    inverted_interval_sequence = [-interval for interval in interval_sequence]
-    
-    return start_sequence_pitches(first_pitch, inverted_interval_sequence)
-
-
-def inversion_pitch_classes(
-    pitch_class_sequence: Sequence,
-    t_factor: int = 0
-) -> List:
-
-    """Finds the inversion of a sequence of pitch classes.
-    """
-    if t_factor == 0:
-        return [(12-pitch_class) % 12 for pitch_class in pitch_class_sequence]
+    if max(pitches) <= 11:
+        return transposition([(12-pitch_class) % 12 for pitch_class in pitches],factor)
     else:
-        return transposition_pitch_classes(inversion_pitch_classes(pitch_class_sequence), t_factor)
+        intervals = [-x for x in intervals(pitches)]
+        return start_sequence_pitches(pitches[0],intervals)
 
-def integer_multiplication_pitch_classes(
+
+def multiplication(
     pitch_class_sequence: Sequence,
     multiplying_factor: int,
 ) -> List:
@@ -238,8 +217,8 @@ def prime_form(
     """
     normal = normal_form(pitch_classes)
     normal_inv = normal_form(inversion_pitch_classes(pitch_classes))
-    norm = transposition_pitch_classes(normal, -normal[0])
-    inv = transposition_pitch_classes(normal_inv, -normal_inv[0])
+    norm = transposition(normal, -normal[0])
+    inv = transposition(normal_inv, -normal_inv[0])
     prime = norm
     if inv < norm:
         prime = inv
@@ -255,8 +234,8 @@ def set_class(
     pcset = [x % 12 for x in pitch_class_set]
     result = {"T":[], "I":[]}
     for i in range(12):
-        transposition = normal_form(transposition_pitch_classes(pcset, i))
-        inv = normal_form(transposition_pitch_classes(inversion_pitch_classes(pcset), i))
+        transposition = normal_form(transposition(pcset, i))
+        inv = normal_form(transposition(inversion(pcset), i))
         if transposition not in result["T"]:
             result["T"].append(transposition)
         if inv not in result["I"]:
@@ -335,11 +314,11 @@ def simple_multiplication(
     """Applies simple pitch class set multiplication onto two pitch class sets.
        See: Heinemann - Pitch Class Set Multiplication in Theory and Practice.
     """
-    ois = transposition_pitch_classes(multiplicand, -multiplicand[0])
+    ois = transposition(multiplicand, -multiplicand[0])
 
     multiplication_result = []
     for i in multiplier:
-        multiplier_ois = normal_form(transposition_pitch_classes(ois, i-ois[0]))
+        multiplier_ois = normal_form(transposition(ois, i-ois[0]))
         for element in multiplier_ois:
             if element not in multiplication_result:
                 multiplication_result.append(element)
@@ -360,7 +339,7 @@ def complex_multiplication(
     simple_multication_result = simple_multiplication(multiplicand, multiplier)
     transposition_factor = (multiplicand[0] - multiplication_factor) % 12
 
-    return normal_form(transposition_pitch_classes(simple_multication_result, transposition_factor))
+    return normal_form(transposition(simple_multication_result, transposition_factor))
 
 
 def stravinsky_rotation(
@@ -370,7 +349,7 @@ def stravinsky_rotation(
     """Returns a numpy array with the Stravinsky rotations of a given pitch class set.
     """
     
-    a = [transposition_pitch_classes(x, pcset[0]-x[0]) for x in all_rotations(pcset)]
+    a = [transposition(x, pcset[0]-x[0]) for x in all_rotations(pcset)]
     m = reshape(a, (len(pcset), len(pcset)))
 
     return m

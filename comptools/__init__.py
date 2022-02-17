@@ -1,1 +1,11 @@
-__all__ = ['advanced_tools', 'basic_tools', 'graphs', 'hindemith', 'kozu', 'lisparser', 'parsemaker', 'parsepy', 'similarity', 'twelve_tone', '_all_classes']
+from ._all_classes import *
+from .advanced_tools import *
+from .basic_tools import *
+from .graphs import *
+from .hindemith import *
+from .kozu import *
+from .lisparser import *
+from .parsemaker import *
+from .parsepy import *
+from .similarity import *
+from .twelve_tone import *

@@ -16,11 +16,11 @@ def twelve_tone_matrix(
     """ Returns a twelve-tone matrix in the form of a Pandas DataFrame.
     """
 
-    inverted_row = inversion_pitch_classes(row)
-    inv_mat = transposition_pitch_classes(inverted_row, row[0]-inverted_row[0])
+    inverted_row = inversion(row)
+    inv_mat = transposition(inverted_row, row[0]-inverted_row[0])
     new = [row]
     for i in range(1, 12):
-        k = transposition_pitch_classes(row, (inv_mat[i] - row[0]) % 12)
+        k = transposition(row, (inv_mat[i] - row[0]) % 12)
         new.append(k)
     m = reshape(new, (12, 12))
     df = DataFrame(m)

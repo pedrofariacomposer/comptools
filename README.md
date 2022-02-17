@@ -1,2 +1,2 @@
 # CompTools
-Tools to Assist in Music Composition
+Tools for Assisting in Composing and Analyzing Music
