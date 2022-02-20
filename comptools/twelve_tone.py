@@ -2,12 +2,11 @@
 Module with the twelve-tone tools of the Comp_Tools library.
 """
 
-from difflib import SequenceMatcher
-from pandas.core.indexes.interval import interval_range
+
 from .basic_tools import *
 from pandas import DataFrame
 from numpy import reshape
-from typing import Sequence, List
+from typing import Sequence, List, Dict
 
 def twelve_tone_matrix(
     row: Sequence,
@@ -26,6 +25,101 @@ def twelve_tone_matrix(
     df = DataFrame(m)
 
     return df
+
+
+def twelve_tone_pallette(
+    row: Sequence,
+) -> Dict:
+
+    """Returns all the classic row forms of a given row
+    """
+
+    r_form = retrograde(row)
+
+    result = dict()
+
+    for ind in range(len(row)):
+        t = transposition(row,ind)
+        i = inversion(row,ind)
+        rs = transposition(r_form,ind)
+        ris = inversion(r_form,ind)
+        if t not in result.values():
+            label = "T" + str(ind)
+            result[label] = t
+        if i not in result.values():
+            label = "I" + str(ind)
+            result[label] = i
+        if rs not in result.values():
+            label = "R" + str(ind)
+            result[label] = rs
+        if ris not in result.values():
+            label = "RI" + str(ind)
+            result[label] = ris
+
+    return result
+
+
+def find_comb(
+    row: Sequence,
+    row_form: Sequence,
+    size: int = 3
+) -> bool:
+    
+    """Compares two rows and returns True is they have some
+    kind of partial combinatoriality. Returns False otherwise.
+    """
+    
+    first_part = row[0:size]
+    second_part = row_form[0:12-size]
+    part_sum = first_part + second_part
+    if sorted(part_sum) == [0,1,2,3,4,5,6,7,8,9,10,11]:
+        return True
+    else:
+        return False
+
+    
+def imbricated(
+        row: Sequence,
+        size: int = 3,
+) -> List:
+    
+    """Returns a list of the imbricated trichords (or some other sized set) 
+    in a given row.
+    """   
+    
+    if size > len(row):
+        print("invalid size of imbricated set")
+        return
+    else:
+        result = []
+        for i in range(len(row)-size+1):
+            result.append(row[i:i+size])
+            return result
+
+
+
+def rotate_subset(
+    row: Sequence,
+    size: int = 3,
+    pattern: Sequence = [3,2,1,0],
+) -> List:
+    
+    """Rotates the trichords (or some other division of a row),
+    by the specified pattern.
+    """    
+    
+    if len(row) % size != 0:
+        print("invalid size of subset")
+        return
+    elif size * len(pattern) != len(row):
+        print("invalid size of pattern of arrangement")
+        return
+    else:
+        chunks = [row[i:i+size] for i in range(0,len(row),size)]
+        result = []
+        for j in pattern:
+            result += chunks[j]
+            return result
 
 
 def order_rep(

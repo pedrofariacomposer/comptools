@@ -4,7 +4,6 @@ Module with the basic tools of the Comp_Tools library.
 
 
 from typing import Dict, Sequence, List
-from copy import copy
 from itertools import chain, combinations
 from collections import Iterable, defaultdict
 from numpy import array, reshape
@@ -64,8 +63,7 @@ def retrograde(
     """Finds the retrograde of any sequence.
     """
 
-    sequence_copy = [element for element in sequence]
-    return sequence_copy[-1:]
+    return list(reversed(sequence))
 
 
 def transposition(
@@ -76,10 +74,12 @@ def transposition(
     """Transposes a sequence of MIDI pitches or pitch classes.
     """
     result = []
+    for p in pitches:
+        result.append(p + transposing_factor)
     if max(pitches) <= 11:
-        return [(pitch + transposing_factor) % 12 for pitch in pitches]
-    else:
-        return [pitch + transposing_factor for pitch in pitches]
+        result = [x % 12 for x in result]
+    return result
+
 
 
 def intervals(
