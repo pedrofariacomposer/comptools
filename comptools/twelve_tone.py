@@ -29,9 +29,11 @@ def twelve_tone_matrix(
 
 def twelve_tone_pallette(
     row: Sequence,
+    extended: bool = False,
 ) -> Dict:
 
-    """Returns all the classic row forms of a given row
+    """Returns all the classic row forms of a given row.
+    If extended = True, returns all 96 forms from Starr and Morris.
     """
 
     r_form = retrograde(row)
@@ -55,6 +57,19 @@ def twelve_tone_pallette(
         if ris not in result.values():
             label = "RI" + str(ind)
             result[label] = ris
+            
+    if extended == True:
+        mult = multiplication(row,5)
+        mult_inv = multiplication(i,5)
+        for ind in range(len(row)):
+            tm = transposition(mult,ind)
+            tmi = transposition(mult_inv,ind)
+            if tm not in result.values():
+                label = "MT" + str(ind)
+                result[label] = tm
+            if tmi not in result.values():
+                label = "MTI" + str(ind)
+                result[label] = tmi
 
     return result
 
