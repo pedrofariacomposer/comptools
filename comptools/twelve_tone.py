@@ -26,10 +26,19 @@ def twelve_tone_matrix(
 
     return df
 
+def morris_rot_trichord(row):
+    chunk_1 = row[0:3]
+    chunk_2 = row[3:6]
+    chunk_3 = row[6:9]
+    chunk_4 = row[9:12]
+
+    return chunk_4 + chunk_3 + chunk_2 + chunk_1
+
 
 def twelve_tone_pallette(
     row: Sequence,
     extended: bool = False,
+    really_extended: bool = False,
 ) -> Dict:
 
     """Returns all the classic row forms of a given row.
@@ -64,13 +73,31 @@ def twelve_tone_pallette(
         for ind in range(len(row)):
             tm = transposition(mult,ind)
             tmi = transposition(mult_inv,ind)
+            rtm = retrograde(tm)
+            rtmi = retrograde(tmi)
             if tm not in result.values():
                 label = "MT" + str(ind)
                 result[label] = tm
             if tmi not in result.values():
                 label = "MTI" + str(ind)
                 result[label] = tmi
-
+            if rtm not in result.values():
+                label = "RMT" + str(ind)
+                result[label] = rtm
+            if rtmi not in result.values():
+                label = "RMTI" + str(ind)
+                result[label] = rtmi
+                
+    if really_extended == True:
+        prov_result = twelve_tone_pallette(row, True)
+        for key, x in result.items():
+            mrt = morris_rot_trichord(x)
+            digits = [x for x in key if x.isdigit()]
+            label = "MRT"
+            for digit in digits:
+                label += digit
+            prov_result[label] = mrt
+        return prov_result
     return result
 
 
