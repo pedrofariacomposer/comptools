@@ -4,9 +4,13 @@ Module with the twelve-tone tools of the Comp_Tools library.
 
 
 from .basic_tools import *
+from .parsepy import accel_asc
 from pandas import DataFrame
 from numpy import reshape
-from typing import Sequence, List, Dict
+from typing import Sequence, List, Dict, Tuple
+from itertools import permutations
+from .master_perms import *
+
 
 def twelve_tone_matrix(
     row: Sequence,
@@ -47,77 +51,128 @@ def twelve_tone_pallette(
 
     r_form = retrograde(row)
 
-    result = dict()
+    
+    if extended == False and really_extended == False:
+        result = dict()
 
-    for ind in range(len(row)):
-        t = transposition(row,ind)
-        i = inversion(row,ind)
-        rs = transposition(r_form,ind)
-        ris = inversion(r_form,ind)
-        if t not in result.values():
-            label = "T" + str(ind)
-            result[label] = t
-        if i not in result.values():
-            label = "I" + str(ind)
-            result[label] = i
-        if rs not in result.values():
-            label = "R" + str(ind)
-            result[label] = rs
-        if ris not in result.values():
-            label = "RI" + str(ind)
-            result[label] = ris
+        for ind in range(len(row)):
+            t = transposition(row,ind)
+            i = inversion(row,ind)
+            rs = transposition(r_form,ind)
+            ris = inversion(r_form,ind)
+            if t not in result.values():
+                label = "T" + str(ind)
+                result[label] = t
+            if i not in result.values():
+                label = "I" + str(ind)
+                result[label] = i
+            if rs not in result.values():
+                label = "R" + str(ind)
+                result[label] = rs
+            if ris not in result.values():
+                label = "RI" + str(ind)
+                result[label] = ris
             
     if extended == True:
-        mult = multiplication(row,5)
-        mult_inv = multiplication(i,5)
-        for ind in range(len(row)):
-            tm = transposition(mult,ind)
-            tmi = transposition(mult_inv,ind)
-            rtm = retrograde(tm)
-            rtmi = retrograde(tmi)
-            if tm not in result.values():
-                label = "MT" + str(ind)
-                result[label] = tm
-            if tmi not in result.values():
-                label = "MTI" + str(ind)
-                result[label] = tmi
-            if rtm not in result.values():
-                label = "RMT" + str(ind)
-                result[label] = rtm
-            if rtmi not in result.values():
-                label = "RMTI" + str(ind)
-                result[label] = rtmi
-                
+        result = dict()
+        prov_result = twelve_tone_pallette(row)
+        for key, x in prov_result.items():
+            result[key] = x
+            mult_5 = multiplication(x,5)
+            if mult_5 not in prov_result.values():
+                label = "M" + key
+                result[label] = mult_5
+        
     if really_extended == True:
-        prov_result = twelve_tone_pallette(row, True)
-        for key, x in result.items():
+        result = dict()
+        prov_result = twelve_tone_pallette(row, extended)
+        for key, x in prov_result.items():
+            result[key] = x
             mrt = morris_rot_trichord(x)
-            digits = [x for x in key if x.isdigit()]
-            label = "MRT"
-            for digit in digits:
-                label += digit
-            prov_result[label] = mrt
-        return prov_result
+            if mrt not in prov_result.values():
+                label = "Rot" + key
+                result[label] = mrt
     return result
 
 
-def find_comb(
-    row: Sequence,
-    row_form: Sequence,
-    size: int = 3
-) -> bool:
+def find_combs(
+        rows: Sequence,
+        part: Sequence
+) -> Sequence:
     
-    """Compares two rows and returns True is they have some
-    kind of partial combinatoriality. Returns False otherwise.
+    """Given a list of rows and a partition of 12,
+    returns how the partition can break the list of rows, if it can
+    in any way. Else, returns False.
     """
     
-    first_part = row[0:size]
-    second_part = row_form[0:12-size]
-    part_sum = first_part + second_part
-    if sorted(part_sum) == [0,1,2,3,4,5,6,7,8,9,10,11]:
-        return True
+    size = len(rows)
+    
+    if size < len(part):
+        return False,"Rows and part have different lengths"
+    
     else:
-        return False
+        for i in range(len(part)):
+            if part[i] > len(rows[i]):
+                return False, "There's a part that's bigger than a row"
+    
+    pieces = [rows[i][0:part[i]] for i in range(len(part))]
+    rests = [rows[i][part[i]:] for i in range(len(part))]
+    piece_sum = []
+    for p in pieces:
+        piece_sum += p
+    if sorted(piece_sum) == list(range(12)):
+        if len(pieces) < size:
+            for i in range(len(pieces),size):
+                rests.append(rows[i])
+        return True,pieces,rests
+    else:
+        return False,rests
+
+
+def result_parts(
+        ps: Sequence
+) -> Sequence:
+    
+    """Given a list of rows, returns all the ways this list
+    can be partitioned.
+    """
+    
+    size = len(ps)
+    result = [[] for _ in range(size)]
+    if size <= 6:
+        all_perms = up_to_six
+    elif 6 < size <= 9:
+        all_perms = up_to_six + six_to_nine
+    elif 9 < size <= 12:
+        all_perms = up_to_six + six_to_nine + ten_to_twelve
+    for i in range(0,size):
+        if i == 0:
+            for p in all_perms:
+                a = find_combs(ps,p)
+                if a[0] == True:
+                    result[0].append([ps,p,a[1],a[2]])
+        else:
+            for r in result[i-1]:
+                g = [y for y in r[3] if len(y) != 0]
+                for p in all_perms:
+                    a = find_combs(g,p)
+                    if a[0] == True:
+                        result[i].append([r,p,a[1],a[2]])
+    return result[size-1]
+
+
+def find_partitions_from_result(
+    sequence: Sequence,
+) -> List:
+
+    """Given the output from result_parts, finds the partition
+    in one of the elements from said output.
+    """
+    
+    if isinstance(sequence, List):
+        return [a for i in sequence for a in find_partitions_from_result(i)]
+    else:
+        return [tuple(sorted(x)) for x in [sequence] if isinstance(x,Tuple)]
 
     
 def imbricated(
