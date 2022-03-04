@@ -224,22 +224,32 @@ def prime_form(
         prime = inv
     return prime
 
-
-def set_class(
-    pitch_class_set: Sequence,
+def contour_profile(
+        seq: Sequence,
 ) -> List:
-    """Returns the set class to which given pitch class set belongs.
-    """
+    
+    """Given a list of pitches or pitch classes, return the contour
+    profile of that list"""
+    
+    return [sorted(seq).index(x) for x in seq]
 
-    pcset = [x % 12 for x in pitch_class_set]
-    result = {"T":[], "I":[]}
-    for i in range(12):
-        transposition = normal_form(transposition(pcset, i))
-        inv = normal_form(transposition(inversion(pcset), i))
-        if transposition not in result["T"]:
-            result["T"].append(transposition)
-        if inv not in result["I"]:
-            result["I"].append(inv)
+
+
+def contour_matrix(
+        contour: Sequence,
+) -> List:
+    
+    """Given a contour list, returns its matrix.
+    """    
+    result = []
+    for i in contour:
+        sub = []
+        for j in contour:
+            val = j - i
+            if val != 0:
+                val = int(val/abs(val))
+            sub.append(val)
+        result.append(sub)
     return result
 
 
