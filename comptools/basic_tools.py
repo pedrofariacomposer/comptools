@@ -224,6 +224,7 @@ def prime_form(
         prime = inv
     return prime
 
+
 def contour_profile(
         seq: Sequence,
 ) -> List:
@@ -232,7 +233,6 @@ def contour_profile(
     profile of that list"""
     
     return [sorted(seq).index(x) for x in seq]
-
 
 
 def contour_matrix(
