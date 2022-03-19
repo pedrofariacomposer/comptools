@@ -9,6 +9,7 @@ comptools/basic_tools.py
 comptools/hindemith.py
 comptools/kozu.py
 comptools/lisparser.py
+comptools/master_perms.py
 comptools/parsemaker.py
 comptools/parsepy.py
 comptools/similarity.py
