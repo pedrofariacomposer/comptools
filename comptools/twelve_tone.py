@@ -47,6 +47,7 @@ def twelve_tone_pallette(
 
     """Returns all the classic row forms of a given row.
     If extended = True, returns all 96 forms from Starr and Morris.
+    If really_extended = True, also returns the trichord retrogrades of all row forms
     """
 
     r_form = retrograde(row)
@@ -129,7 +130,7 @@ def find_combs(
         return False,rests
 
 
-def result_parts(
+def all_partitions(
         ps: Sequence
 ) -> Sequence:
     
@@ -165,7 +166,7 @@ def find_partitions_from_result(
     sequence: Sequence,
 ) -> List:
 
-    """Given the output from result_parts, finds the partition
+    """Given the output from all_partitions, finds the partition
     in one of the elements from said output.
     """
     
