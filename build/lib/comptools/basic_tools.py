@@ -88,7 +88,7 @@ def intervals(
     icclass: bool = False,
 ) -> List:
 
-    """Finds the interval sequence of a sequence of MIDI pitches.
+    """Finds the interval sequence of a sequence of MIDI pitches or pitch classes.
     """
 
     if max(pitches) <= 11:
