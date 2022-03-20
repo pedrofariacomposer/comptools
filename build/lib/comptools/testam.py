@@ -1,44 +1,7 @@
-"""
-Module with the advanced tools of the Comp_Tools library.
-"""
-
-
-from .basic_tools import flatten_sequence, rotate_sequence
-from .lisparser import LisParser
-from typing import Sequence, List
 import music21 as m21
+import abjad
 
-def rot_measure(
-    measure: Sequence,
-    rot_num: int,
-) -> List:
-
-    """Rotates the positions of the OpenMusic representation of a measure.
-    """
-
-    measure_lisp = measure.lisp
-    flat_lisp = flatten_sequence(measure)
-    flat_rot = rotate_sequence(flat_lisp,rot_num)
-    for x in ["0", ".", "-"]: measure_lisp = measure_lisp.replace(x,"")
-    indexes = []
-    for ind,x in enumerate(measure_lisp):
-        if x not in ["(",")"," "]: indexes.append(ind)
-    str_lisp = list(measure_lisp)
-    for i in range(len(indexes)): str_lisp[indexes[i]] = str(flat_rot[i])
-    new_lisp = "".join(str_lisp)
-    new_first = LisParser(new_lisp).recursive_unpack()
-
-    return new_first
-
-
-def parse_notes(
-    listNotes: List,
-) -> List:
-
-    """Given a list of music21 notes, rests and/or chordsd,
-    group the tuplets as a single list, using the tuplets.type attribute.
-    """
-
+def parse_notes(listNotes):
     result = []
     i = 0
 
@@ -59,13 +22,11 @@ def parse_notes(
             i += len(t_group)
     return result
 
-
-def lily21(
-    notes: List,
-) -> List:
+def lily21(notes):
 
     '''Given a container of Music21 notes or chords, returns a Lilypond representation
-    of that container!'''
+    of that container.
+    WARNING: DOES NOT YET HANDLE TUPLETS!'''
 
     pcdict = {0:"c", 1: "cs", 2: 'd', 3: 'ef',
             4: 'e', 5: 'f', 6:'fs', 7:'g', 8:'af',
@@ -124,6 +85,32 @@ def lily21(
             mult = str(1/nota[0].duration.tuplets[0].tupletMultiplier())
             new_result = '\\tuplet ' + mult + " {" + prov_result + "} "
             result += new_result
+
+
+
+
     return result
 
+testcont = [m21.note.Note(quarterLength=0.75),m21.note.Note(),m21.note.Note(),
+m21.note.Rest(), m21.chord.Chord([64,67,69])]
 
+filename = "comptools/test_tup.xml"
+
+piece = list(m21.converter.parse(filename).flat.getElementsByClass(["Note","Rest","Chord"]))
+
+f_no = piece[0]
+
+# print(1/f_no.duration.tuplets[0].tupletMultiplier())
+# print(f_no.duration.components)
+# print(f_no.duration.tuplets[0].type)
+
+
+    
+new_string = lily21(parse_notes(piece))
+
+voice_1 = abjad.Voice(new_string, name="Voice 1")
+voice_2 =abjad.Voice(new_string, name="Voice 2")
+abjad.mutate.transpose(voice_2, "-m3")
+staff_1 = abjad.Staff([voice_1,voice_2], name="Staff 1")
+abjad.mutate.scale(staff_1[0][0][0],abjad.Multiplier(2))
+abjad.show(staff_1 ,output_directory=r"C:/Users/Pedro/Google Drive/Python_Scripts/test abjad", should_open=False)
