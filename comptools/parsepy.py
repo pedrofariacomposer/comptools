@@ -47,6 +47,7 @@ def split_chord(
 
 def partitional_analysis(
     filename: str,
+    no_reps: bool = False,
 ) -> Dict:
 
     """Returns the rhythmic partitional analysis of a piece, given its filename.
@@ -82,8 +83,23 @@ def partitional_analysis(
                 if round(y[0] + y[1],5) > round(el,5):
                     cur_list.append(y)
         counts = Counter(cur_list)
-        analise[el] = tuple(sorted(list(counts.values())))
+        final_count = tuple(sorted(list(counts.values())))
+        if final_count == []:
+            final_count = [0]
+        analise[el] = final_count
         new_values.append(cur_list)
+        
+    if no_reps == True:
+        new_analise = dict()
+        for y, el in enumerate(offsets):
+            if y == 0:
+                new_analise[el] = analise[el]
+            else:
+                if analise[el] != analise[offsets[y-1]]:
+                    new_analise[el] = analise[el]
+                else:
+                    pass
+        return new_analise
     return analise
 
 
