@@ -84,8 +84,8 @@ def partitional_analysis(
                     cur_list.append(y)
         counts = Counter(cur_list)
         final_count = tuple(sorted(list(counts.values())))
-        if final_count == []:
-            final_count = [0]
+        if len(final_count) == 0:
+            final_count = tuple([0])
         analise[el] = final_count
         new_values.append(cur_list)
         
