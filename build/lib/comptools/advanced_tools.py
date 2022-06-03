@@ -38,7 +38,7 @@ def parse_notes(
     """Given a list of music21 notes, rests and/or chordsd,
     group the tuplets as a single list, using the tuplets.type attribute.
     """
-    
+
     result = []
     i = 0
 
@@ -58,6 +58,7 @@ def parse_notes(
             result.append(t_group)
             i += len(t_group)
     return result
+
 
 def lily21(
     notes: List,

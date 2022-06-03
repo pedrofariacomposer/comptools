@@ -79,11 +79,11 @@ def partitional_analysis(
             cur_list = [(el,x.quarterLength) for x in offset_dict[el]]
             prev_list = new_values[i-1]
             for y in prev_list:
-                if y[0] + y[1] > el:
+                if round(y[0] + y[1],5) > round(el,5):
                     cur_list.append(y)
-    counts = Counter(cur_list)
-    analise[el] = sorted(list(counts.values()))
-    new_values.append(cur_list)
+        counts = Counter(cur_list)
+        analise[el] = tuple(sorted(list(counts.values())))
+        new_values.append(cur_list)
     return analise
 
 

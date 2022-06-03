@@ -10,7 +10,7 @@ from fractions import Fraction
 import matplotlib.pyplot as plt
 from .basic_tools import markov
 from graphviz import Digraph
-from collections import defaultdict
+from collections import defaultdict, Counter
 
 
 def extract_parts(
@@ -32,60 +32,58 @@ def extract_parts(
     return parts
 
 
+def split_chord(
+    chord: m21.chord.Chord,
+) -> List:
+
+    """Splits a music21 chord into a list of notes"""
+
+    result = [x for x in chord]
+    for i in result:
+        i.quarterLength = chord.quarterLength
+        i.offset = chord.offset
+    return result
+
+
 def partitional_analysis(
     filename: str,
-) -> List:
+) -> Dict:
 
     """Returns the rhythmic partitional analysis of a piece, given its filename.
     """
   
-    raw_parts = extract_parts(filename)
-
-    parts = []
-    for part in raw_parts:
-        for nota in part:
-            parts.append(nota)
-
-    parts.sort(key= lambda x: x.offset)
-
-    parts_off = defaultdict(list)
-
-    for nota in parts:
-        offset = float(nota.offset)
-        dur = float(nota.quarterLength)
-        if type(nota) == m21.note.Note:
-            if dur != 0:
-                parts_off[offset].append(dur)
-        elif type(nota) == m21.note.Rest:
-            parts_off[offset] = []
-        elif type(nota) == m21.chord.Chord:
-            for el in nota:
-                dur = float(el.quarterLength)
-                if dur != 0:
-                    parts_off[offset].append(dur)
-
-    parts_final = [[key]+ parts_off[key] for key in sorted(list(parts_off.keys()))]
-
-    for i in range(1,len(parts_final)):
-        prev = parts_final[i-1]
-        cur = parts_final[i]
-        for el in prev[1:]:
-            if type(el) != tuple:
-                if el + prev[0] > cur[0]:
-                    cur.append(tuple([prev[0],el]))
+    offset_dict = defaultdict(list)
+    parts = extract_parts(filename)
+    offsets = []
+    for p in parts:
+        for el in p:
+            if el.offset not in offsets:
+                offsets.append(el.offset)
+    offsets.sort()
+    for p in parts:
+        for el in p:
+            if isinstance(el, m21.chord.Chord):
+                new_el = split_chord(el)
+                for element in new_el:
+                    offset_dict[el.offset].append(element)
+            elif isinstance(el, m21.note.Note):
+                offset_dict[el.offset].append(el)
             else:
-                goal = el[0] + el[1]
-                if goal > cur[0]:
-                    cur.append(el)
-
+                pass
+    new_values = []
     analise = dict()
-    for parte in parts_final:
-        part = parte[1:]
-        count_analise = []
-        ind = list(set(part))
-        for x in ind:
-            count_analise.append(part.count(x))
-            analise[parte[0]] = tuple(sorted(count_analise))
+    for i, el in enumerate(offsets):
+        if i == 0:
+            cur_list = [(el,x.quarterLength) for x in offset_dict[el]]
+        else:
+            cur_list = [(el,x.quarterLength) for x in offset_dict[el]]
+            prev_list = new_values[i-1]
+            for y in prev_list:
+                if round(y[0] + y[1],5) > round(el,5):
+                    cur_list.append(y)
+        counts = Counter(cur_list)
+        analise[el] = tuple(sorted(list(counts.values())))
+        new_values.append(cur_list)
     return analise
 
 

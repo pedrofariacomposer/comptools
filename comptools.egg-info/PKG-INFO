@@ -5,8 +5,6 @@ Summary: Tools for assisting in composing and analyzing music
 Home-page: https://github.com/pedrofariacomposer/comptools
 Author: peDro faRia
 Author-email: pedrofaria1989@gmail.com
-License: UNKNOWN
-Platform: UNKNOWN
 Classifier: Programming Language :: Python :: 3
 Classifier: License :: OSI Approved :: MIT License
 Classifier: Operating System :: OS Independent
@@ -16,5 +14,3 @@ License-File: LICENSE
 
 # CompTools
 Tools for Assisting in Composing and Analyzing Music
-
-
