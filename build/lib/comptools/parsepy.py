@@ -394,12 +394,13 @@ def part_rep(
 def partitiograph(
     filename: str,
     new_name: str,
+    no_reps: bool = False,
 ) -> None:
 
     """Function to create the rhythmic partitiograph of a piece of music.
     """
 
-    analysis = partitional_analysis(filename)
+    analysis = partitional_analysis(filename,no_reps=no_reps)
     keys = sorted(list(analysis.keys()))
 
     partitions = [analysis[key] for key in keys]
