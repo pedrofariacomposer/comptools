@@ -7,6 +7,7 @@ from .basic_tools import flatten_sequence, rotate_sequence
 from .lisparser import LisParser
 from typing import Sequence, List
 import music21 as m21
+from math import lcm, ceil
 
 def rot_measure(
     measure: Sequence,
@@ -125,5 +126,3 @@ def lily21(
             new_result = '\\tuplet ' + mult + " {" + prov_result + "} "
             result += new_result
     return result
-
-

@@ -4,6 +4,7 @@ pyproject.toml
 setup.cfg
 comptools/__init__.py
 comptools/_all_classes.py
+comptools/abjadtools.py
 comptools/advanced_tools.py
 comptools/basic_tools.py
 comptools/hindemith.py
@@ -12,6 +13,8 @@ comptools/lisparser.py
 comptools/master_perms.py
 comptools/parsemaker.py
 comptools/parsepy.py
+comptools/scampshorts.py
+comptools/sievetools.py
 comptools/similarity.py
 comptools/twelve_tone.py
 comptools.egg-info/PKG-INFO
